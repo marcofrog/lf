@@ -1,4 +1,4 @@
-## Basic configuration
+S## Basic configuration
 set previewer ctpv
 set cleaner ctpvclear
 &ctpv -s $id
@@ -35,10 +35,12 @@ cmd fzf ${{
 
 
 ## Mappings
+map ZQ quit
 map f 
 map f fzf
 map D delete
 map s push :shell<enter>$SHELL<enter>
+map S push :shell<enter>$SHELL<enter>
 map <s-up> half-up
 map <s-down> half-down
 map . set hidden!
