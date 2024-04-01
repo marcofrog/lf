@@ -1,17 +1,16 @@
-S## Basic configuration
-set previewer ctpv
-set cleaner ctpvclear
+## Basic configuration
+## set previewer ctpv
+## set cleaner ctpvclear
 &ctpv -s $id
 &ctpvquit $idset hidden true
 set ignorecase true
-
 ## Delete script
 cmd delete ${{
     set -f
     printf "$fx\n\n"
     printf "Delete? [y/N]"
     read -n1 ans
-    [ "$ans" = "y" ] && rm -rf $fx
+    [ "$ans" = "y" ] && rm -rf "$fx"
 }}
 
 cmd changeDir ${{
@@ -32,16 +31,54 @@ cmd fzf ${{
 	fi
 
 }}
+## PASTE
+cmd paste-override &{{
+	set -f
+	mode=$(head -1 ~/.local/share/lf/files)
+	list=$(sed 1d ~/.local/share/lf/files)
+	set -- _ $list; shift
+	[ $# -gt 0 ] || exit
+	case $mode in
+		copy)
+			rsync -r "$@" ./
+			;;
+		move)
+			rsync -r --remove-source-files "$@" ./
+			;;
+	esac
+	lf -remote 'save\nmove\n'
+	lf -remote "send $id load"
+	lf -remote "send $id echo \"\033[0;32mpasted $# file(s)\033[0m\""
+}}
+
+cmd mkfile ${{
+  printf "File Name: "
+  read ans
+  [ "$ans" != "" ] && touch $ans
+}}
 
 
 ## Mappings
 map ZQ quit
 map f 
 map f fzf
-map D delete
-map s push :shell<enter>$SHELL<enter>
-map S push :shell<enter>$SHELL<enter>
+map R reload
+map <enter> open
+map } scroll_up
+map { scroll_down
+map P
+map P paste-override
+map DD $mv $fx ~/.Trash
+map S push :shell<enter>
 map <s-up> half-up
 map <s-down> half-down
 map . set hidden!
+#map , { set sortby time; set info time; set reverse; }
+#map <lt> { set sortby natural; set info ; }
 map e $$EDITOR "$f"
+map C $codium -n "$f"
+map s push $mkdir<space>
+# Movement
+map gd cd ~/Documents/Durham_College
+map gi cd ~/.config/nvim
+map gt cd /Volumes/\[C\]\ tiny\ 11/Users/gleb/
